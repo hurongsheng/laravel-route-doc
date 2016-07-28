@@ -1,0 +1,20 @@
+{
+    "name": "hurongsheng/laravel-route-doc",
+    "type": "library",
+    "description": "easily create doc based on route.php",
+    "keywords": ["laravel", "route", "doc"],
+    "homepage": "",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "hurongsheng",
+            "email": "plokm031004@126.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4"
+    },
+    "autoload": {
+        "psr-4": {"hurongsheng\\": ""}
+    }
+}
