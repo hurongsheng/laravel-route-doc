@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{$title}}}</title>
+    <title>{{$title}}</title>
 <body class="laravel-route-doc-body">
 <div class="laravel-route-doc-div">
     <table class="laravel-route-doc-table" border="1">
