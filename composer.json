@@ -7,7 +7,7 @@
         "laravel",
         "route",
         "api",
-        "doc",
+        "doc"
     ],
     "homepage": "",
     "license": "MIT",
