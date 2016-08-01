@@ -2,10 +2,12 @@
     "name": "hurongsheng/laravel-route-doc",
     "type": "library",
     "description": "easily create doc based on route.php",
+    "version": "0.9.1",
     "keywords": [
         "laravel",
         "route",
-        "doc"
+        "api",
+        "doc",
     ],
     "homepage": "",
     "license": "MIT",

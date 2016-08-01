@@ -4,7 +4,7 @@
     <title>{{$title}}}</title>
 <body class="laravel-route-doc-body">
 <div class="laravel-route-doc-div">
-    <table class="laravel-route-doc-table" border="0">
+    <table class="laravel-route-doc-table" border="1">
         <tr class="laravel-route-doc-tr">
             <td class="laravel-route-title laravel-route-url">路由</td>
             <td class="laravel-route-title laravel-route-method">方法</td>
