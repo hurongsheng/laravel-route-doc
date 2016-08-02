@@ -19,10 +19,9 @@ use hurongsheng/route;
 
 ```php
 $route=new route();
+$data=$route->getDoc();
+$view=$route->getDefaultView($view_title);
 ```
-
-* [`$data=$route->getDoc();`]
-* [`$view=$route->getDefaultView($view_title);`]
 
 
 ### Rules in route.php
