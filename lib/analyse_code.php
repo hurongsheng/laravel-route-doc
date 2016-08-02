@@ -16,7 +16,7 @@ class analyse_code
     protected $reflection;
     protected $controller;
     protected $hidden_param;
-    protected $hidden_param_name = 'hidden_params';
+    protected $hidden_param_name = 'ignore_params';
 
     public function __construct($controller)
     {

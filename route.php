@@ -4,7 +4,7 @@ namespace hurongsheng;
 
 use hurongsheng\lib\analyse_route;
 
-class master
+class route
 {
     protected $config = [];
     protected $config_name = 'route_file';
@@ -53,7 +53,7 @@ class master
     {
         $view_path = realpath(base_path("vendor/hurongsheng/laravel-route-doc/lib"));
         \View::addLocation($view_path);
-        return view('view', ['api_doc' => $this->getDoc(), 'title' => $title]);
+        return view('route_doc', ['api_doc' => $this->getDoc(), 'title' => $title]);
     }
 
     protected function getBody($text)

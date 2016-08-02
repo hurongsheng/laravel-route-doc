@@ -14,7 +14,7 @@ use Illuminate\Routing\ControllerInspector;
 class analyse_route
 {
     protected $config = [];
-    protected $config_name = 'controller_name_space';
+    protected $config_name = 'controller_namespace';
 
     public function __construct()
     {
