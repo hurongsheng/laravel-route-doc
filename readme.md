@@ -14,7 +14,8 @@ composer require hurongsheng/laravel-route-doc
 ### Usage
 
 ```php
-use hurongsheng/route;
+add hurongsheng\RouteDocServiceProvider::class in app.php
+php artisan vendor:publish --provider="hurongsheng/LaravelRouteDoc/RouteDocServiceProvider"
 ```
 
 ```php
