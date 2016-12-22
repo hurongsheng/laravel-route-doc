@@ -13,6 +13,10 @@
         height: 30px;
         width: 70px;
     }
+    .input-group-addon{
+        width: 30% !important;
+        text-align: left !important;
+    }
 </style>
 <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" rel="stylesheet">
 <body class="route_doc">
@@ -30,7 +34,7 @@
                 @endif
             @endforeach
             <td width="80">
-                <button class="btn btn-info test-all btn-sm">test all</button>
+                <button class="btn btn-warning test-all btn-sm">test all</button>
             </td>
         </tr>
 
@@ -56,10 +60,10 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
                             class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+                <h4 class="modal-title" id="myModalLabel">uri params for test</h4>
             </div>
             <div class="modal-body">
-                ...
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">close</button>
@@ -75,15 +79,21 @@
     $(".test-this").on('click', function () {
         var id = $(this).attr('data');
         get_params(id, function (data) {
-            console.log(data);
+            $(".modal-body").html(data['html']);
             $('#myModal').modal('toggle');
         })
     });
     var get_params = function (id, success) {
+        var html = '<div class="form-group"><div class="input-group"><div class="input-group-addon">' +
+                '%s' +
+                '</div><input class="form-control" value="%s" placeholder="Enter value"></div></div>';
         $.ajax({
             type: 'GET',
             url: "params",
-            data: {'id': id},
+            data: {
+                'id': id,
+                'html': html
+            },
             success: success,
             error: function () {
                 alert('something wrong');
