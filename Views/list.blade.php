@@ -82,7 +82,7 @@
     var get_params = function (id, success) {
         $.ajax({
             type: 'GET',
-            url: "{{$uri['params']}}",
+            url: "params",
             data: {'id': id},
             success: success,
             error: function () {

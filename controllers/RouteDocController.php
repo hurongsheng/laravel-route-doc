@@ -24,12 +24,10 @@ class  RouteDocController extends Controller
         $keys = $docs[0] ? array_keys($docs[0]) : [];
         \App::make('RouteDoc');
         $show = config('route_doc.view_show');
-        $uri = config('route_doc.uri', []);
         return view('RouteDoc::list', [
             'docs' => $docs,
             'keys' => $keys,
             'show' => $show,
-            'uri' => $uri,
         ]);
     }
 
