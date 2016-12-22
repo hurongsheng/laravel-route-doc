@@ -79,3 +79,9 @@ routes
 #### add @description/@request document when in phpstorm 
 
     http://jingyan.baidu.com/article/48b558e35b81c27f38c09ab7.html
+    
+    
+\hurongsheng\LaravelRouteDoc\RouteDocServiceProvider::class
+composer dump-autoload
+php artisan optimize
+php artisan vendor:publish

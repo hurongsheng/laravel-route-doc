@@ -19,7 +19,7 @@ class RouteDocServiceProvider extends ServiceProvider
      * Indicates if loading of the provider is deferred.
      * @var bool
      */
-//    protected $defer = true;
+    protected $defer = true;
 
     /**
      * Bootstrap the application events.
@@ -27,9 +27,9 @@ class RouteDocServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__ . '/views', 'route-doc');
-        $this->publishes(['config.php' => config_path('route_doc.php')]);
-        $this->publishes([__DIR__ . 'migrations/' => database_path('/migrations')]);
+        $this->loadViewsFrom(__DIR__ . '/Views', 'RouteDoc');
+        $this->publishes([__DIR__ . '/config.php' => config_path('route_doc.php')]);
+        $this->publishes([__DIR__ . '/Migrations/' => database_path('/migrations')]);
     }
 
     /**

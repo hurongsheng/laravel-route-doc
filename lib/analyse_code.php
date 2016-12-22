@@ -6,7 +6,7 @@
  * Time: 17:56
  */
 
-namespace hurongsheng\lib;
+namespace hurongsheng\LaravelRouteDoc\Lib;
 
 use ReflectionClass;
 
@@ -21,8 +21,7 @@ class analyse_code
     public function __construct($controller)
     {
         $this->controller = $controller;
-        $config = require(dirname(dirname(__FILE__)) . "/config.php");
-        $this->hidden_param = $config[$this->hidden_param_name];
+        $this->hidden_param = config('route_doc.ignore_params');
     }
 
     public function getReflection()
@@ -82,9 +81,8 @@ class analyse_code
             }
             unset($m[0][0]);
             $match['desc'] = implode(" ", $m[0]) ? : '';
-
         }
-        return $matches[0];
+        return array_values($matches[0]);
     }
 
     public function getDescription($doc)
