@@ -5,13 +5,15 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateRouteCache extends Migration
 {
+
     public function up()
     {
-        $table = config('route_doc')['table_name'];
-        if (Schema::hasTable($table)) {
+        $this->connection = config('route_doc.table_connection', config('database.default'));
+        $table = config('route_doc.table_name');
+        if (Schema::connection($this->connection)->hasTable($table)) {
             throw new \Exception('table exist');
         }
-        Schema::create($table, function ($table) {
+        Schema::connection($this->connection)->create($table, function ($table) {
             $table->collation = 'utf8_general_ci';
             $table->increments('id');
             $table->string('domain');
@@ -39,7 +41,8 @@ class CreateRouteCache extends Migration
 
     public function down()
     {
-        $table = config('route_doc')['table_name'];
-        Schema::dropIfExists($table);
+        $table = config('route_doc.table_name');
+        $this->connection = config('route_doc.table_connection', config('database.default'));
+        Schema::connection($this->connection)->dropIfExists($table);
     }
 }

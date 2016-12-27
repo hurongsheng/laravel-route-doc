@@ -24,7 +24,6 @@ Class RouteDoc
     public function all()
     {
         return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
-        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
     }
 
     public function refresh()

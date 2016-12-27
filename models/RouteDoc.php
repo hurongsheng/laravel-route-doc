@@ -18,6 +18,7 @@ class RouteDoc extends Eloquent
     {
         parent::__construct($attributes);
         $this->table = config('route_doc.table_name', $this->table);
+        $this->connection = config('route_doc.table_connection', config('database.default'));
     }
 
     public static function getUnique($domain, $uri, $method)
@@ -31,6 +32,7 @@ class RouteDoc extends Eloquent
 
     public static function clearExcept($ids)
     {
-        return \DB::table(with(new static())->table)->whereNotIn('id', $ids)->update(['state' => static::STATE_DELETE]);
+        $model = with(new static());
+        return \DB::connection($model->connection)->table($model->table)->whereNotIn('id', $ids)->update(['state' => static::STATE_DELETE]);
     }
 }

@@ -44,7 +44,7 @@
             <tr class="table_body" id="{{$doc['id']}}">
                 @foreach($doc as $key=>$value)
                     @if($show[$key])
-                        @if($key=='params')
+                        @if($key=='params'&& $value)
                             <td class="{{$key}}">
                                 <table>
                                     @foreach($value as $k=>$desc)
