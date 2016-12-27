@@ -4,11 +4,9 @@ namespace hurongsheng\LaravelRouteDoc\Controllers;
 
 use \App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
-use hurongsheng\LaravelRouteDoc\Lib\analyse_code;
 use \hurongsheng\LaravelRouteDoc\RouteDoc;
-use hurongsheng\lib\analyse_route;
 use Illuminate\Http\Request;
-use \hurongsheng\LaravelRouteDoc\Models\RouteDoc as RouteDocModel;
+use \hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
 
 /**
  * Created by PhpStorm.
@@ -25,10 +23,15 @@ class  RouteDocController extends Controller
         $keys = $docs[0] ? array_keys($docs[0]) : [];
         \App::make('RouteDoc');
         $show = config('route_doc.view_show');
+        $button_list = [
+            ['method' => 'post', 'uri' => 'refresh', 'name' => 'update from route'],
+            ['method' => 'get', 'uri' => 'params-all', 'name' => 'update from doc'],
+        ];
         return view('RouteDoc::list', [
             'docs' => $docs,
             'keys' => $keys,
             'show' => $show,
+            'button_list' => $button_list,
         ]);
     }
 
@@ -39,13 +42,11 @@ class  RouteDocController extends Controller
      */
     public function getParamsAll(Request $request)
     {
-        $this->postRefresh();
         $models = RouteDocModel::where('state', RouteDocModel::STATE_WORK)->get();
         foreach ($models as $model) {
             try {
-                $this->handleModel($model);
+                RouteDoc::handleModel($model);
             } catch (\Exception $e) {
-
             }
         }
     }
@@ -63,7 +64,12 @@ class  RouteDocController extends Controller
         $id = $request->input('id');
         $tr = $request->input('html', "");
         $model = RouteDocModel::findOrFail($id);
-        $model = $this->handleModel($model);
+        $model = RouteDoc::handleModel($model);
+        return $this->formatHtml($model, $tr);
+    }
+
+    protected function formatHtml(RouteDocModel $model, $tr)
+    {
         $html = "";
         foreach ($model->params as $key => $desc) {
             $value = $model->test_data['body'][$key] ? : '';
@@ -82,43 +88,12 @@ class  RouteDocController extends Controller
         return $tr;
     }
 
-    protected function handleModel(RouteDocModel $model)
-    {
-        $params = $doc = [];
-        if ($model->controller) {
-            list($controller, $method) = explode("@", $model->controller);
-            $analyse = new analyse_code($controller);
-            try {
-                $doc = $analyse->getFunctionDocument($method, $model->uri, $fixed_uri);
-                $model->uri = $fixed_uri;
-                $model->description = $doc['description'] ? : '';
-                $model->author = $doc['author'] ? : '';
-            } catch (\Exception $e) {
-                $model->state = RouteDocModel::STATE_DELETE;
-            }
-        }
-        if (preg_match_all('/(?<=[{])[\S]+?(?=[}])/', $model->uri, $uris)) {
-            foreach ($uris[0] as $uri) {
-                $uri_1 = str_replace("?", "", $uri);
-                $desc = ($uri == $uri_1) ? $uri_1 : $uri_1 . "(optional)";
-                $params[$uri_1] = $doc['params'][$uri_1] ? : $desc;
-                if ($model->where && $model->where[$uri_1]) {
-                    $params[$uri_1] = $params[$uri_1] . '/' . $model->where[$uri_1] . '/';
-                }
-            }
-        };
-        $model->params = array_merge($doc['params'] ? : [], $params);
-        $model->test_data = $model->test_data ? : [];
-        $model->save();
-        return $model;
-    }
-
     /**
-     * @description
+     * @description test-route
      * @param Request $request
      * @author hurs
      */
-    public function postTest(Request $request)
+    public function postTestRoute(Request $request)
     {
         $id = $request->input('id');
         $body = $request->input('body', []);
@@ -137,15 +112,8 @@ class  RouteDocController extends Controller
 
     protected function sendRequest(Request $request, RouteDocModel $model)
     {
+        $url = $this->formatUrl($request, $model);
         $method = $model->method;
-        if (!$model->domain) {
-            $url = $request->getHost() . '/' . trim($model->uri, '/ ');
-        } else {
-            $url = implode('/', [trim($model->domain, '/ '), trim($model->uri, '/ ')]);
-        }
-        if (!preg_match('/http/', $url)) {
-            $url = $request->getScheme() . '://' . $url;
-        }
         $body = $model->test_data['body'] ? : [];
         $headers = $model->test_data['headers'] ? : [];
         $success_code = $model->test_data['success_code'] ? : [];
@@ -168,6 +136,27 @@ class  RouteDocController extends Controller
                 throw new \Exception($e->getMessage(), $code);
             }
         }
+    }
+
+    protected function formatUrl(Request $request, RouteDocModel $model)
+    {
+        if (!$model->domain) {
+            $url = $request->getHost() . '/' . trim($model->uri, '/ ');
+        } else {
+            $url = implode('/', [trim($model->domain, '/ '), trim($model->uri, '/ ')]);
+        }
+        if (!preg_match('/http/', $url)) {
+            $url = $request->getScheme() . '://' . $url;
+        }
+        if (RouteDoc::matchUri($model, $uri_params)) {
+            foreach ($uri_params[0] as $uri_param) {
+                $input = $request->input('body')[$uri_param];
+                if (!is_null($input)) {
+                    $url = preg_replace("/\{" . $uri_param . "[?]?\}/", $input, $url);
+                }
+            }
+        }
+        return $url;
     }
 
     public function postRefresh()

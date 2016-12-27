@@ -8,9 +8,10 @@
 
 namespace hurongsheng\LaravelRouteDoc;
 
+use hurongsheng\LaravelRouteDoc\Lib\analyse_code;
 use Route;
 use Closure;
-use  \hurongsheng\LaravelRouteDoc\Models\RouteDoc as RouteDocModel;
+use  \hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
 
 Class RouteDoc
 {
@@ -35,6 +36,42 @@ Class RouteDoc
             $this->analyseRoute($route, $method_need, $docs);
         }
         $this->create($docs);
+    }
+
+    public static function handleModel(RouteDocModel $model)
+    {
+        $params = $doc = [];
+        if ($model->controller) {
+            list($controller, $method) = explode("@", $model->controller);
+            $analyse = new analyse_code($controller);
+            try {
+                $doc = $analyse->getFunctionDocument($method, $model->uri, $fixed_uri);
+                $model->uri = $fixed_uri;
+                $model->description = $doc['description'] ? : '';
+                $model->author = $doc['author'] ? : '';
+            } catch (\Exception $e) {
+                $model->state = RouteDocModel::STATE_DELETE;
+            }
+        }
+        if (self::matchUri($model, $uris)) {
+            foreach ($uris[0] as $uri) {
+                $uri_1 = str_replace("?", "", $uri);
+                $desc = ($uri == $uri_1) ? '' : "(optional)";
+                $params[$uri_1] = $doc['params'][$uri_1] ? : $desc;
+                if ($model->where && $model->where[$uri_1]) {
+                    $params[$uri_1] = $params[$uri_1] . '/' . $model->where[$uri_1] . '/';
+                }
+            }
+        };
+        $model->params = array_merge($doc['params'] ? : [], $params);
+        $model->test_data = $model->test_data ? : [];
+        $model->save();
+        return $model;
+    }
+
+    public static function matchUri(RouteDocModel $model, &$uri_params = [])
+    {
+        return preg_match_all('/(?<=[{])[\S]+?(?=[}])/', $model->uri, $uri_params);
     }
 
     protected function create($docs)

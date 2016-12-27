@@ -8,6 +8,7 @@
     .route_doc .table_body td {
         font-size: 12px;
         vertical-align: middle;
+        word-wrap: break-word;
     }
 
     .route_doc table .btn {
@@ -15,17 +16,46 @@
         width: 90px;
     }
 
+    .route_doc table .edit .btn {
+        height: 30px;
+        width: 55px;
+    }
+
+    td.params {
+        max-width: 300px;;
+    }
+
+    td.uri {
+        max-width: 250px;;
+    }
+
+    td table {
+        width: 100%;
+    }
+
+    td table td:first-child {
+        width: 25%;
+    }
+
     .input-group-addon {
         width: 30% !important;
         text-align: left !important;
     }
+
+    .btn_list_all {
+        margin: 20px auto;
+    }
 </style>
 <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" rel="stylesheet">
 <body class="route_doc">
-<div style="padding: 10px;">
-
-</div>
 <div style="padding: 10px 20px;">
+    <div class="btn_list_all">
+        @foreach($button_list as $button)
+            <button class="btn btn-warning btn_list btn-sm"
+                    data-uri="{{$button['uri']}}"
+                    data-method="{{$button['method']}}">{{$button['name']}}</button>
+        @endforeach
+    </div>
     <table class="table table-bordered table-condensed ">
         <tr class="table_header">
             @foreach($keys as $key)
@@ -36,8 +66,10 @@
                 @endif
             @endforeach
             <td width="100">
-                <button class="btn btn-warning update-all btn-sm">update doc</button>
+                test route
+                {{--<button class="btn btn-warning update-all btn-sm">update doc</button>--}}
             </td>
+            <td width="100">edit</td>
         </tr>
 
         @foreach($docs as $doc)
@@ -55,6 +87,8 @@
                                     @endforeach
                                 </table>
                             </td>
+                        @elseif($value==[])
+                            <td class="{{$key}}"></td>
                         @else
                             <td class="{{$key}}">{{is_array($value)?json_encode($value):$value}}</td>
                         @endif
@@ -64,6 +98,9 @@
                 @endforeach
                 <td class="test">
                     <button class="btn btn-info btn-sm test-this" data="{{$doc['id']}}">test route</button>
+                </td>
+                <td class="edit">
+                    <button class="btn btn-default btn-sm edit-this" data="{{$doc['id']}}">edit</button>
                 </td>
             </tr>
         @endforeach
@@ -113,7 +150,7 @@
                 data[data_temp[index]] = $(this).val();
             }
         });
-        body['data'] = data;
+        body['body'] = data;
         body['id'] = id;
         body['headers'] = {};
         test_this(body, function () {
@@ -129,41 +166,43 @@
             window.location.reload();
         })
     });
-    var test_this = function (data, success, error) {
-        $.ajax({
-            type: 'POST',
-            url: "test",
-            data: data,
-            success: success,
-            error: error
+    $(".btn_list").on('click', function () {
+        var type = $(this).attr('data-method');
+        var uri = $(this).attr('data-uri');
+        btn_list(type, uri);
+    });
+
+    var btn_list = function (type, url) {
+        send_request(type, url, {}, function () {
+            window.location.reload();
+        }, function () {
+            alert('something wrong');
+            window.location.reload();
         });
     };
+    var test_this = function (data, success, error) {
+        send_request('POST', 'test-route', data, success, error);
+    };
     var update_all = function (success) {
-        $.ajax({
-            type: 'GET',
-            url: "params-all",
-            data: {},
-            success: success,
-            error: function () {
-                alert('something wrong');
-            }
+        send_request('GET', 'params-all', {}, success, function () {
+            alert('something wrong');
         });
     };
     var get_params = function (id, success) {
         var html = '<div class="form-group"><div class="input-group"><div class="input-group-addon">' +
                 '{$key}' +
                 '</div><input class="form-control" value="{$value}" placeholder="{$desc}"></div></div>';
+        send_request('GET', 'params', {'id': id, 'html': html}, success, function () {
+            alert('something wrong');
+        });
+    };
+    var send_request = function (type, uri, data, success, error) {
         $.ajax({
-            type: 'GET',
-            url: "params",
-            data: {
-                'id': id,
-                'html': html
-            },
+            type: type,
+            url: uri,
+            data: data,
             success: success,
-            error: function () {
-                alert('something wrong');
-            }
+            error: error
         });
     }
 </script>

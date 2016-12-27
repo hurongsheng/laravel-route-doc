@@ -4,7 +4,7 @@ namespace hurongsheng\LaravelRouteDoc\Models;
 
 use \Eloquent;
 
-class RouteDoc extends Eloquent
+class RouteDocModel extends Eloquent
 {
     const STATE_DELETE = 0;
     const STATE_WORK = 1;

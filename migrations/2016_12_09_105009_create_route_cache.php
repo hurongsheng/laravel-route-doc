@@ -32,10 +32,12 @@ class CreateRouteCache extends Migration
             $table->integer('state');
             $table->integer('last_test');
             $table->string('author');
+            $table->text('description');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->index(['domain', 'uri', 'method']);
             $table->index(['method']);
+            $table->index(['state']);
         });
     }
 
