@@ -43,13 +43,30 @@ class analyse_code
     /**
      * @param $function
      * @param $url
+     * @param $fixed_uri
      * @return string
      * @author hurs
      */
-    public function getFunctionDocument($function, $url)
+    public function getFunctionDocument($function, $url, &$fixed_uri)
     {
+        $parameters = [];
+        $preg = "/(?<=[\{])[\S]+?(?=[?\}]+)/";
         $method = $this->getReflection()->getMethod($function);
-        return $this->getDocument($method, $url);
+        foreach ($method->getParameters() as $position => $parameter) {
+            if (!$parameter->getClass()) {
+                $parameters[] = $parameter->getName();
+            }
+        }
+        $fixed_uri = explode("/", $url);
+        $i = 0;
+        foreach ($fixed_uri as &$u) {
+            if (preg_match($preg, $u, $match)) {
+                $u = $parameters[$i] ? preg_replace($preg, $parameters[$i], $u) : $u;
+                $i++;
+            }
+        }
+        $fixed_uri = implode("/", $fixed_uri);
+        return $this->getDocument($method, $fixed_uri);
     }
 
     public function getDocument(\ReflectionMethod $method, $url)
@@ -65,24 +82,24 @@ class analyse_code
 
     public function getParams($doc, $url)
     {
-        $preg_url = "/(?<=[\{])[a-z\_]+(?=[\}])/";
-        preg_match_all($preg_url, $url, $hidden_urls);
+//        $preg_url = "/(?<=[\{])[a-z\_]+(?=[\}])/";
+//        preg_match_all($preg_url, $url, $hidden_urls);
         $preg = "/(?<=@param |@request )[ \t\S]*/";
         $preg2 = "/(?<=[$])[ \t\S]*/";
         $preg3 = "/[\S]+/";
         preg_match_all($preg, $doc, $matches);
+        $params = [];
         foreach ($matches[0] as $key => &$match) {
             preg_match($preg2, $match, $m);
             preg_match_all($preg3, $m[0], $m);
-            $match = ['param' => $m[0][0]];
-            if (in_array($match['param'], array_merge($this->hidden_param, $hidden_urls[0] ? : []))) {
-                unset($matches[0][$key]);
-                continue;
+            $k = $m[0][0];
+            if (!in_array($k, $this->hidden_param)) {
+//            if (in_array($match['param'], array_merge($this->hidden_param, $hidden_urls[0] ? : []))) {
+                unset($m[0][0]);
+                $params[$k] = implode(" ", $m[0]) ? : '';
             }
-            unset($m[0][0]);
-            $match['desc'] = implode(" ", $m[0]) ? : '';
         }
-        return array_values($matches[0]);
+        return $params;
     }
 
     public function getDescription($doc)

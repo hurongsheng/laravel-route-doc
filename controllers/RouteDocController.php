@@ -33,41 +33,83 @@ class  RouteDocController extends Controller
     }
 
     /**
+     * @description
+     * @param Request $request
+     * @author hurs
+     */
+    public function getParamsAll(Request $request)
+    {
+        $this->postRefresh();
+        $models = RouteDocModel::where('state', RouteDocModel::STATE_WORK)->get();
+        foreach ($models as $model) {
+            try {
+                $this->handleModel($model);
+            } catch (\Exception $e) {
+
+            }
+        }
+    }
+
+    /**
      * @description get route info from code
      * @param Request $request
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|static
      * @request       $id route_doc_id
-     * @request       $html html replace $key&$value
+     * @request       $html html replace {$key} & {$value} & {$desc}
      * @author hurs
      */
     public function getParams(Request $request)
     {
         $id = $request->input('id');
-        $tr = $request->input('html', "<tr><td class='param'>%s</td><td class='value'><input value='%s'/></td></tr>");
+        $tr = $request->input('html', "");
         $model = RouteDocModel::findOrFail($id);
+        $model = $this->handleModel($model);
+        $html = "";
+        foreach ($model->params as $key => $desc) {
+            $value = $model->test_data['body'][$key] ? : '';
+            $html = $html . $this->replaceHtml($tr, $key, $value, $desc);
+        }
+        $success_code = $model->test_data['success_code'] ? implode(",", $model->test_data['success_code']) : 200;
+        $model->html = $html . $this->replaceHtml($tr, 'success_code', $success_code, 'success status code like 200,302,404');
+        return $model;
+    }
+
+    protected function replaceHtml($tr, $key, $value = "", $desc = "")
+    {
+        $tr = str_replace('{$key}', $key, $tr);
+        $tr = str_replace('{$value}', $value, $tr);
+        $tr = str_replace('{$desc}', $desc, $tr);
+        return $tr;
+    }
+
+    protected function handleModel(RouteDocModel $model)
+    {
+        $params = $doc = [];
         if ($model->controller) {
             list($controller, $method) = explode("@", $model->controller);
             $analyse = new analyse_code($controller);
-            $doc = $analyse->getFunctionDocument($method, $model->uri);
-            $model->description = $doc['description'] ? : '';
-            $model->author = $doc['author'] ? : '';
-            $model->params = $doc['params'] ? : [];
-            $model->test_data = $model->test_data ? : [];
-            $model->save();
-        } else {
-            $model->params = [];
-            $model->test_data = $model->test_data ? : [];
-            $model->save();
+            try {
+                $doc = $analyse->getFunctionDocument($method, $model->uri, $fixed_uri);
+                $model->uri = $fixed_uri;
+                $model->description = $doc['description'] ? : '';
+                $model->author = $doc['author'] ? : '';
+            } catch (\Exception $e) {
+                $model->state = RouteDocModel::STATE_DELETE;
+            }
         }
-        $html = "";
-        foreach ($model->params as $param) {
-            $key = $param['param'];
-            $value = $model->test_data['body'][$param['param']] ? : '';
-            $html = $html . sprintf($tr, $key, $value);
-        }
-        $source_code = $model->test_data['success_code'] ? implode(",", $model->test_data['success_code']) : 200;
-        $html = $html . sprintf($tr, 'success_code', $source_code);
-        $model->html = $html;
+        if (preg_match_all('/(?<=[{])[\S]+?(?=[}])/', $model->uri, $uris)) {
+            foreach ($uris[0] as $uri) {
+                $uri_1 = str_replace("?", "", $uri);
+                $desc = ($uri == $uri_1) ? $uri_1 : $uri_1 . "(optional)";
+                $params[$uri_1] = $doc['params'][$uri_1] ? : $desc;
+                if ($model->where && $model->where[$uri_1]) {
+                    $params[$uri_1] = $params[$uri_1] . '/' . $model->where[$uri_1] . '/';
+                }
+            }
+        };
+        $model->params = array_merge($doc['params'] ? : [], $params);
+        $model->test_data = $model->test_data ? : [];
+        $model->save();
         return $model;
     }
 
@@ -81,6 +123,7 @@ class  RouteDocController extends Controller
         $id = $request->input('id');
         $body = $request->input('body', []);
         $headers = $request->input('headers', []);
+        $headers = array_merge(config('route_doc.default_headers', []), $headers);
         $success_code = $request->input('success_code', '');
         $model = RouteDocModel::findOrFail($id);
         $test_data = $model->test_data ? : [];
@@ -90,21 +133,6 @@ class  RouteDocController extends Controller
         $model->test_data = $test_data;
         $model->save();
         $this->sendRequest($request, $model);
-    }
-
-    public function getTest()
-    {
-        try {
-            $client = new Client();
-            $response = $client->get('http://app.ddd.com/route/params', [
-                'headers' => [],
-                'json' => ['id' => 63]
-            ]);
-            return $response->getBody()->getContents();
-        } catch (\Exception $e) {
-            return $e->getResponse()->getBody()->getContents();
-        }
-
     }
 
     protected function sendRequest(Request $request, RouteDocModel $model)
@@ -134,11 +162,15 @@ class  RouteDocController extends Controller
             $code = $e->getCode();
             $model->last_test = in_array($code, $success_code) ? 1 : 0;
             $model->save();
-            throw new \Exception($e->getResponse()->getBody()->getContents(), $code);
+            if ($e->getResponse()) {
+                throw new \Exception($e->getResponse()->getBody()->getContents(), $code);
+            } else {
+                throw new \Exception($e->getMessage(), $code);
+            }
         }
     }
 
-    public function anyRefresh()
+    public function postRefresh()
     {
         $doc = new RouteDoc();
         $doc->refresh();
