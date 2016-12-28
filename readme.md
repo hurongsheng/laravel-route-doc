@@ -38,13 +38,16 @@ or declare Route::controller() for hurongsheng\LaravelRouteDoc\Controllers\Route
      * @param         $id
      * @request       $name
      * @request       $something
+     * @group         group@group2
      * @return SomeClass
      * @author your name
      */
+     
+     @request==@param
     
 ### Helper
 
-#### add @description/@request document when in phpstorm 
+#### add @description @request document when in phpstorm 
 
     http://jingyan.baidu.com/article/48b558e35b81c27f38c09ab7.html
     

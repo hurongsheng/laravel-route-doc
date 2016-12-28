@@ -5,7 +5,7 @@ return [
      * table name in database
      */
     'table_name' => 'route_doc',
-    'table_connection' => '',
+    'table_connection' => 'transform',
 
     /*
      * uri import ignore $request
@@ -27,24 +27,43 @@ return [
     'default_headers' => [
         'Accept' => 'application/json',
     ],
+
+    /*
+     * show select & btn
+     */
+    'btn_list' => [
+        'list' => ['domain', 'method', 'group', 'group2', 'author'],
+        'manage' => [
+            'group', 'group2',
+            ['method' => 'post', 'uri' => 'refresh', 'name' => 'update from route'],
+            ['method' => 'get', 'uri' => 'params-all', 'name' => 'update from doc'],
+        ],
+    ],
+
     'view_show' => [
-        'domain' => 'domain',
-        'uri' => 'uri',
-        'method' => 'method',
-//        'as' => 'as',
-//        'uses' => 'uses',
-//        'controller' => 'controller',
-//        'namespace' => 'namespace',
-//        'prefix' => 'prefix',
-//        'group' => 'group',
-//        'group2' => 'group2',
-//        'where' => 'where',
-        'params' => 'params',
-        'description' => 'description',
-        'author' => 'author',
-        'updated_at' => 'update time',
-        'last_test' => 'test result',
-//        'test_data' => 'test_data',
+        'list' => [
+            'domain' => 'domain',
+            'uri' => 'uri',
+            'method' => 'method',
+            'params' => 'params',
+            'description' => 'description',
+            'author' => 'author',
+            'group' => 'group',
+            'group2' => 'group2',
+            'updated_at' => 'update time ↓',
+        ],
+        'manage' => [
+            'domain' => 'domain',
+            'uri' => 'uri',
+            'method' => 'method',
+            'uses' => 'uses',
+            'description' => 'description',
+            'author' => 'author',
+            'group' => 'group',
+            'group2' => 'group2',
+            'last_test' => 'test result',
+            'updated_at' => 'update time',
+        ],
     ],
     /*
      * hidden something. need refresh

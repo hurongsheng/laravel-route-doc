@@ -27,6 +27,21 @@ Class RouteDoc
         return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
     }
 
+    public function whereRequestDomain($where)
+    {
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
+    }
+
+    public function whereRequestUpdated($where)
+    {
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy('updated_at', 'desc')->get();
+    }
+
+    public function btnList($key)
+    {
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->orderBy($key)->select([$key])->distinct()->get()->pluck($key)->toArray();
+    }
+
     public function refresh()
     {
         $routes = Route::getRoutes()->getRoutes();
@@ -53,6 +68,10 @@ Class RouteDoc
                 $model->state = RouteDocModel::STATE_DELETE;
             }
         }
+        list($group, $group2) = explode("@", $model->uses);
+        $group = explode('\\', $group);
+        $model->group = array_pop($group) ? : '';
+        $model->group2 = $group2 ? : '';
         if (self::matchUri($model, $uris)) {
             foreach ($uris[0] as $uri) {
                 $uri_1 = str_replace("?", "", $uri);

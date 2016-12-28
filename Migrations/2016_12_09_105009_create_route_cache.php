@@ -38,6 +38,10 @@ class CreateRouteCache extends Migration
             $table->index(['domain', 'uri', 'method']);
             $table->index(['method']);
             $table->index(['state']);
+            $table->index(['group']);
+            $table->index(['group2']);
+            $table->index(['author']);
+            $table->index(['updated_at', 'state']);
         });
     }
 

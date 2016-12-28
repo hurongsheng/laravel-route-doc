@@ -5,10 +5,9 @@ namespace hurongsheng\LaravelRouteDoc\Controllers;
 use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
 use hurongsheng\LaravelRouteDoc\RouteDoc;
-
 use Illuminate\Http\Request;
-
 use hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
+use Closure;
 
 /**
  * Created by PhpStorm.
@@ -18,27 +17,62 @@ use hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
  */
 class  RouteDocController extends Controller
 {
-    public function getList()
+
+    /**
+     * @description list view
+     * @param Request $request
+     * @return mixed
+     * @author hurs
+     */
+    public function getList(Request $request)
     {
-        $doc = new RouteDoc();
-        $docs = $doc->all()->toArray();
-        $keys = $docs[0] ? array_keys($docs[0]) : [];
-        \App::make('RouteDoc');
-        $show = config('route_doc.view_show');
-        $button_list = [
-            ['method' => 'post', 'uri' => 'refresh', 'name' => 'update from route'],
-            ['method' => 'get', 'uri' => 'params-all', 'name' => 'update from doc'],
-        ];
-        return view('RouteDoc::list', [
-            'docs' => $docs,
-            'keys' => $keys,
-            'show' => $show,
-            'button_list' => $button_list,
-        ]);
+        return $this->view($request, 'list', function (RouteDoc $doc, $where) {
+            return $doc->whereRequestUpdated($where)->toArray();
+        });
     }
 
     /**
-     * @description
+     * @description manage view
+     * @param Request $request
+     * @return mixed
+     * @author hurs
+     */
+    public function getManage(Request $request)
+    {
+        return $this->view($request, 'manage', function (RouteDoc $doc, $where) {
+            return $doc->whereRequestDomain($where)->toArray();
+        });
+    }
+
+    protected function view(Request $request, $name, Closure $function)
+    {
+        $where = [];
+        $doc = new RouteDoc();
+        $btn_list = config("route_doc.btn_list.$name", []);
+        foreach ($btn_list as &$btn) {
+            if (is_string($btn)) {
+                if ($request->exists($btn)) {
+                    $where[$btn] = $request->input($btn);
+                }
+                $btn = ['data' => $doc->btnList($btn), 'type' => 'select', 'key' => $btn];
+            } else {
+                $btn['type'] = 'request';
+            }
+        }
+        $docs = $function($doc, $where);
+        \App::make('RouteDoc');
+        return view("RouteDoc::$name", [
+            'docs' => $docs,
+            'keys' => $docs[0] ? array_keys($docs[0]) : [],
+            'show' => config("route_doc.view_show.$name"),
+            'btn_list' => $btn_list,
+            'where' => $where,
+        ]);
+    }
+
+
+    /**
+     * @description update from doc
      * @param Request $request
      * @author hurs
      */
@@ -91,7 +125,7 @@ class  RouteDocController extends Controller
     }
 
     /**
-     * @description test-route
+     * @description test route
      * @param Request $request
      * @author hurs
      */
@@ -161,6 +195,10 @@ class  RouteDocController extends Controller
         return $url;
     }
 
+    /**
+     * @description update from route.php
+     * @author hurs
+     */
     public function postRefresh()
     {
         $doc = new RouteDoc();
