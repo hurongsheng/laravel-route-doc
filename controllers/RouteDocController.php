@@ -2,11 +2,13 @@
 
 namespace hurongsheng\LaravelRouteDoc\Controllers;
 
-use \App\Http\Controllers\Controller;
+use App\Http\Controllers\Controller;
 use GuzzleHttp\Client;
-use \hurongsheng\LaravelRouteDoc\RouteDoc;
+use hurongsheng\LaravelRouteDoc\RouteDoc;
+
 use Illuminate\Http\Request;
-use \hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
+
+use hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
 
 /**
  * Created by PhpStorm.
