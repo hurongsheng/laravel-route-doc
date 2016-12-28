@@ -2,7 +2,7 @@
 
 namespace hurongsheng\LaravelRouteDoc\Models;
 
-use \Eloquent;
+use Eloquent;
 
 class RouteDocModel extends Eloquent
 {
