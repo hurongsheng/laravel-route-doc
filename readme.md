@@ -26,8 +26,11 @@ or declare Route::controller() for hurongsheng\LaravelRouteDoc\Controllers\Route
 
 ```php
      change config in route_doc.php as your wish
-     RouteDocController@getList return default view of doc
-     visit list and click update doc then wait reload
+     RouteDocController@getManage return default view of doc
+     visit manage and click update route&update doc then wait reload
+     
+     RouteDocController@getManage
+     RouteDocController@getList
 ```
 
 ### Rules in controller document

@@ -32,9 +32,9 @@ return [
      * show select & btn
      */
     'btn_list' => [
-        'list' => ['domain', 'method', 'group', 'group2', 'author'],
+        'list' => ['domain', 'method', 'controller_name', 'function', 'author'],
         'manage' => [
-            'group', 'group2',
+            'controller_name', 'function',
             ['method' => 'post', 'uri' => 'refresh', 'name' => 'update from route'],
             ['method' => 'get', 'uri' => 'params-all', 'name' => 'update from doc'],
         ],
@@ -48,8 +48,7 @@ return [
             'params' => 'params',
             'description' => 'description',
             'author' => 'author',
-            'group' => 'group',
-            'group2' => 'group2',
+            'controller_name' => 'controller_name',
             'updated_at' => 'update time ↓',
         ],
         'manage' => [
@@ -59,8 +58,6 @@ return [
             'uses' => 'uses',
             'description' => 'description',
             'author' => 'author',
-            'group' => 'group',
-            'group2' => 'group2',
             'last_test' => 'test result',
             'updated_at' => 'update time',
         ],

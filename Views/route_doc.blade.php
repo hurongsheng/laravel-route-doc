@@ -26,7 +26,7 @@
             max-width: 300px !important;
         }
 
-        td.controller {
+        td.controller, td.uses {
             max-width: 250px !important;
         }
 
@@ -55,6 +55,7 @@
         .btn_list_all {
             margin: 20px auto;
         }
+
     </style>
 @show
 <link href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.5/css/bootstrap.min.css" rel="stylesheet">
@@ -65,7 +66,7 @@
             @foreach($btn_list as $btn)
                 @if($btn['type']=='select')
                     <select class="{{$btn['key']}}" data-key="{{$btn['key']}}">
-                        <option>--{{$btn['key']}}--</option>
+                        <option class="option_all">--{{$btn['key']}}--</option>
                         @foreach($btn['data'] as $value)
                             @if($where[$btn['key']]===$value)
                                 <option value="{{$value}}" selected>{{$value}}</option>

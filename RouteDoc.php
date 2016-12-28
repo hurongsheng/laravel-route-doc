@@ -37,9 +37,12 @@ Class RouteDoc
         return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy('updated_at', 'desc')->get();
     }
 
-    public function btnList($key)
+    public function btnList($key, $where)
     {
-        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->orderBy($key)->select([$key])->distinct()->get()->pluck($key)->toArray();
+        if (key_exists($key, $where)) {
+            unset($where[$key]);
+        }
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy($key)->select([$key])->distinct()->get()->pluck($key)->toArray();
     }
 
     public function refresh()
@@ -68,10 +71,6 @@ Class RouteDoc
                 $model->state = RouteDocModel::STATE_DELETE;
             }
         }
-        list($group, $group2) = explode("@", $model->uses);
-        $group = explode('\\', $group);
-        $model->group = array_pop($group) ? : '';
-        $model->group2 = $group2 ? : '';
         if (self::matchUri($model, $uris)) {
             foreach ($uris[0] as $uri) {
                 $uri_1 = str_replace("?", "", $uri);
@@ -132,6 +131,11 @@ Class RouteDoc
             } else {
                 $doc['uses'] = 'unknow';
             }
+            list($controller_name, $function) = explode("@", $doc['uses']);
+            $controller_name = explode('\\', $controller_name);
+            $doc['controller_name'] = array_pop($controller_name) ? : '';
+            $doc['function'] = $function ? : '';
+
             $doc['controller'] = $action['controller'] ? : "";
             if (config('route_doc.hidden.missingMethod', 0) && preg_match('/@missingMethod/', $doc['controller'])) {
                 continue;

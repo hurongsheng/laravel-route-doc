@@ -50,11 +50,13 @@ class  RouteDocController extends Controller
         $doc = new RouteDoc();
         $btn_list = config("route_doc.btn_list.$name", []);
         foreach ($btn_list as &$btn) {
+            if (is_string($btn) && $request->exists($btn)) {
+                $where[$btn] = $request->input($btn);
+            }
+        }
+        foreach ($btn_list as &$btn) {
             if (is_string($btn)) {
-                if ($request->exists($btn)) {
-                    $where[$btn] = $request->input($btn);
-                }
-                $btn = ['data' => $doc->btnList($btn), 'type' => 'select', 'key' => $btn];
+                $btn = ['data' => $doc->btnList($btn, $where), 'type' => 'select', 'key' => $btn];
             } else {
                 $btn['type'] = 'request';
             }
