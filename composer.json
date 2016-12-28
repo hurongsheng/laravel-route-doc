@@ -22,15 +22,8 @@
         "guzzlehttp/guzzle": "^6.2"
     },
     "autoload": {
-        "classmap": [
-            "Controllers",
-            "Lib",
-            "Models"
-        ],
-        "files": [
-            "RouteDoc.php",
-            "RouteDocServiceProvider.php",
-            "RouteTransClass.php"
-        ]
+        "psr-4": {
+            "hurongsheng\\LaravelRouteDoc\\": ""
+        }
     }
 }
