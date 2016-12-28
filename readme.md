@@ -14,23 +14,25 @@ composer require hurongsheng/laravel-route-doc
 ### Usage
 
 ```php
-add hurongsheng\LaravelRouteDoc\RouteDocServiceProvider::class,in app.php
+add hurongsheng\LaravelRouteDoc\RouteDocServiceProvider::class into config/app.php--providers
 php artisan vendor:publish --provider="hurongsheng\LaravelRouteDoc\RouteDocServiceProvider"
 php artisan migrate
 ```
 
 ```php
 declare SomeController extend hurongsheng\LaravelRouteDoc\Controllers\RouteDocController;
-or declare Route::controller() for hurongsheng\LaravelRouteDoc\Controllers\RouteDocController;
+and declare Route::controller() SomeController;
+hurongsheng\LaravelRouteDoc\Controllers\RouteDocController extend App\Http\Controllers\Controller
 ```
 
 ```php
-     change config in route_doc.php as your wish
+
+     config:config/route_doc.php
      RouteDocController@getManage return default view of doc
+     RouteDocController@getList return default view of doc
+     
      visit manage and click update route&update doc then wait reload
      
-     RouteDocController@getManage
-     RouteDocController@getList
 ```
 
 ### Rules in controller document
@@ -41,7 +43,6 @@ or declare Route::controller() for hurongsheng\LaravelRouteDoc\Controllers\Route
      * @param         $id
      * @request       $name
      * @request       $something
-     * @group         group@group2
      * @return SomeClass
      * @author your name
      */
