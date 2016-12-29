@@ -26,8 +26,8 @@ class  RouteDocController extends Controller
      */
     public function getList(Request $request)
     {
-        return $this->view($request, 'list', function (RouteDoc $doc, $where) {
-            return $doc->whereRequestUpdated($where)->toArray();
+        return $this->view($request, 'list', function ($where) {
+            return RouteDoc::whereRequestUpdated($where)->toArray();
         });
     }
 
@@ -39,15 +39,14 @@ class  RouteDocController extends Controller
      */
     public function getManage(Request $request)
     {
-        return $this->view($request, 'manage', function (RouteDoc $doc, $where) {
-            return $doc->whereRequestDomain($where)->toArray();
+        return $this->view($request, 'manage', function ($where) {
+            return RouteDoc::whereRequestDomain($where)->toArray();
         });
     }
 
     protected function view(Request $request, $name, Closure $function)
     {
         $where = [];
-        $doc = new RouteDoc();
         $btn_list = config("route_doc.btn_list.$name", []);
         foreach ($btn_list as &$btn) {
             if (is_string($btn) && $request->exists($btn)) {
@@ -56,12 +55,12 @@ class  RouteDocController extends Controller
         }
         foreach ($btn_list as &$btn) {
             if (is_string($btn)) {
-                $btn = ['data' => $doc->btnList($btn, $where), 'type' => 'select', 'key' => $btn];
+                $btn = ['data' => RouteDoc::btnList($btn, $where), 'type' => 'select', 'key' => $btn];
             } else {
                 $btn['type'] = 'request';
             }
         }
-        $docs = $function($doc, $where);
+        $docs = $function($where);
         \App::make('RouteDoc');
         return view("RouteDoc::$name", [
             'docs' => $docs,
@@ -80,7 +79,7 @@ class  RouteDocController extends Controller
      */
     public function getParamsAll(Request $request)
     {
-        $models = RouteDocModel::where('state', RouteDocModel::STATE_WORK)->get();
+        $models = RouteDoc::getWorking();
         foreach ($models as $model) {
             try {
                 RouteDoc::handleModel($model);

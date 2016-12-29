@@ -5,7 +5,7 @@ return [
      * table name in database
      */
     'table_name' => 'route_doc',
-    'table_connection' => 'transform',
+    'table_connection' => '',
 
     /*
      * uri import ignore $request

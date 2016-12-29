@@ -12,6 +12,7 @@ use hurongsheng\LaravelRouteDoc\Lib\analyse_code;
 use Route;
 use Closure;
 use  \hurongsheng\LaravelRouteDoc\Models\RouteDocModel;
+use App;
 
 Class RouteDoc
 {
@@ -22,27 +23,41 @@ Class RouteDoc
 
     }
 
-    public function all()
+    public static function all()
     {
-        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)
+            ->where('env', App::environment())
+            ->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
     }
 
-    public function whereRequestDomain($where)
+    public static function getWorking()
     {
-        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)
+            ->where('env', App::environment())->get();
     }
 
-    public function whereRequestUpdated($where)
+    public static function whereRequestDomain($where)
     {
-        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy('updated_at', 'desc')->get();
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)
+            ->where('env', App::environment())->where($where)
+            ->orderBy('domain')->orderBy('uri')->orderBy('method')->get();
     }
 
-    public function btnList($key, $where)
+    public static function whereRequestUpdated($where)
+    {
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)
+            ->where('env', App::environment())
+            ->where($where)->orderBy('updated_at', 'desc')->get();
+    }
+
+    public static function btnList($key, $where)
     {
         if (key_exists($key, $where)) {
             unset($where[$key]);
         }
-        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where($where)->orderBy($key)->select([$key])->distinct()->get()->pluck($key)->toArray();
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)
+            ->where('env', App::environment())->where($where)
+            ->orderBy($key)->select([$key])->distinct()->get()->pluck($key)->toArray();
     }
 
     public function refresh()
@@ -101,11 +116,12 @@ Class RouteDoc
                 $model->$key = $value;
             }
             $model->state = RouteDocModel::STATE_WORK;
+            $model->env = App::environment();
             $model->save();
             $ids[] = $model->id;
         }
         if ($ids) {
-            RouteDocModel::clearExcept($ids);
+            RouteDocModel::clearExcept($ids, App::environment());
         }
     }
 

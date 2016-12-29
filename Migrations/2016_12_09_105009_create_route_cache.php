@@ -16,6 +16,7 @@ class CreateRouteCache extends Migration
         Schema::connection($this->connection)->create($table, function ($table) {
             $table->collation = 'utf8_general_ci';
             $table->increments('id');
+            $table->string('env');
             $table->string('domain');
             $table->string('uri');
             $table->string('method');
@@ -35,13 +36,13 @@ class CreateRouteCache extends Migration
             $table->text('description');
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
-            $table->index(['domain', 'uri', 'method']);
-            $table->index(['method']);
-            $table->index(['state']);
-            $table->index(['controller_name']);
-            $table->index(['function']);
-            $table->index(['author']);
-            $table->index(['updated_at', 'state']);
+            $table->index(['env', 'domain', 'uri', 'method']);
+            $table->index(['env', 'method']);
+            $table->index(['env', 'state']);
+            $table->index(['env', 'controller_name']);
+            $table->index(['env', 'function']);
+            $table->index(['env', 'author']);
+            $table->index(['env', 'updated_at', 'state']);
         });
     }
 

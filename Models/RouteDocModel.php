@@ -30,9 +30,9 @@ class RouteDocModel extends Eloquent
         ]);
     }
 
-    public static function clearExcept($ids)
+    public static function clearExcept($ids, $env)
     {
         $model = with(new static());
-        return \DB::connection($model->connection)->table($model->table)->whereNotIn('id', $ids)->update(['state' => static::STATE_DELETE]);
+        return \DB::connection($model->connection)->table($model->table)->where('env', $env)->whereNotIn('id', $ids)->update(['state' => static::STATE_DELETE]);
     }
 }
