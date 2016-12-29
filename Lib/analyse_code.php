@@ -50,7 +50,7 @@ class analyse_code
     public function getFunctionDocument($function, $url, &$fixed_uri)
     {
         $parameters = [];
-        $preg = "/(?<=[\{])[\S]+?(?=[?\}]+)/";
+        $preg = "/(?<=[\{])[\S]+?(?=[?\}]+)/u";
         $method = $this->getReflection()->getMethod($function);
         foreach ($method->getParameters() as $position => $parameter) {
             if (!$parameter->getClass()) {
@@ -82,11 +82,11 @@ class analyse_code
 
     public function getParams($doc, $url)
     {
-//        $preg_url = "/(?<=[\{])[a-z\_]+(?=[\}])/";
+//        $preg_url = "/(?<=[\{])[a-z\_]+(?=[\}])/u";
 //        preg_match_all($preg_url, $url, $hidden_urls);
-        $preg = "/(?<=@param |@request )[ \t\S]*/";
-        $preg2 = "/(?<=[$])[ \t\S]*/";
-        $preg3 = "/[\S]+/";
+        $preg = "/(?<=@param |@request )[ \t\S]*/u";
+        $preg2 = "/(?<=[$])[ \t\S]*/u";
+        $preg3 = "/[\S]+/u";
         preg_match_all($preg, $doc, $matches);
         $params = [];
         foreach ($matches[0] as $key => &$match) {
@@ -114,7 +114,7 @@ class analyse_code
 
     protected function getBaseData($doc, $key)
     {
-        $preg = "/(?<=@$key )[ \t\S]*/";
+        $preg = "/(?<=@$key )[ \t\S]*/u";
         preg_match($preg, $doc, $match);
         return $match[0];
     }

@@ -91,7 +91,7 @@ class analyse_route
     protected function controller($route_body, &$item = "")
     {
         $controllerInspector = new ControllerInspector();
-        $controller_rules = "/(?<=get|post|any|put|delete)[\S]+/";
+        $controller_rules = "/(?<=get|post|any|put|delete)[\S]+/u";
         $code = $this->getController($route_body['controller']);
         $methods = $code->getFunctions();
         foreach ($methods as $method) {

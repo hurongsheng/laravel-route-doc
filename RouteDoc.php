@@ -104,7 +104,7 @@ Class RouteDoc
 
     public static function matchUri(RouteDocModel $model, &$uri_params = [])
     {
-        return preg_match_all('/(?<=[{])[\S]+?(?=[}])/', $model->uri, $uri_params);
+        return preg_match_all('/(?<=[{])[\S]+?(?=[}])/u', $model->uri, $uri_params);
     }
 
     protected function create($docs)
@@ -153,7 +153,7 @@ Class RouteDoc
             $doc['function'] = $function ? : '';
 
             $doc['controller'] = $action['controller'] ? : "";
-            if (config('route_doc.hidden.missingMethod', 0) && preg_match('/@missingMethod/', $doc['controller'])) {
+            if (config('route_doc.hidden.missingMethod', 0) && preg_match('/@missingMethod/u', $doc['controller'])) {
                 continue;
             }
             $doc['namespace'] = $action['namespace'] ? : "";
