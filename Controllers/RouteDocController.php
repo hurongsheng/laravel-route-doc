@@ -177,14 +177,18 @@ class  RouteDocController extends Controller
 
     protected function formatUrl(Request $request, RouteDocModel $model)
     {
-        if (!$model->domain) {
-            $url = $request->getHost() . '/' . trim($model->uri, '/ ');
-        } else {
-            $url = implode('/', [trim($model->domain, '/ '), trim($model->uri, '/ ')]);
+        $domain = $model->domain ? : $request->getSchemeAndHttpHost();
+        list($scheme, $http_host) = explode("://", $domain);
+        if (!$http_host) {
+            $http_host = $scheme;
+            $scheme = "";
         }
-        if (!preg_match('/http/', $url)) {
-            $url = $request->getScheme() . '://' . $url;
+        $scheme = $scheme ? : $request->getScheme();
+        list($host, $port) = explode(":", $http_host);
+        if (!$port && !in_array($request->getPort(), ['80', '443'])) {
+            $port = $request->getPort();
         }
+        $url = $port ? "$scheme://$host:$port" : "$scheme://$host";
         if (RouteDoc::matchUri($model, $uri_params)) {
             foreach ($uri_params[0] as $uri_param) {
                 $input = $request->input('body')[$uri_param];
