@@ -188,7 +188,7 @@ class  RouteDocController extends Controller
         if (!$port && !in_array($request->getPort(), ['80', '443'])) {
             $port = $request->getPort();
         }
-        $url = $port ? "$scheme://$host:$port" : "$scheme://$host";
+        $url = $port ? "$scheme://$host:$port/" . $model->uri : "$scheme://$host/" . $model->uri;
         if (RouteDoc::matchUri($model, $uri_params)) {
             foreach ($uri_params[0] as $uri_param) {
                 $input = $request->input('body')[$uri_param];
