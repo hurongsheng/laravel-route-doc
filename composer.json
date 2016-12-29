@@ -2,7 +2,7 @@
     "name": "hurongsheng/laravel-route-doc",
     "type": "library",
     "description": "easily create doc based on route.php",
-    "version": "2.1.2",
+    "version": "2.1.4",
     "keywords": [
         "laravel",
         "route",

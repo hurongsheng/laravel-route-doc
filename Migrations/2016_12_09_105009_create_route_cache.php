@@ -19,6 +19,7 @@ class CreateRouteCache extends Migration
             $table->string('env');
             $table->string('domain');
             $table->string('uri');
+            $table->string('route_uri');
             $table->string('method');
             $table->string('as');
             $table->string('uses');
@@ -37,6 +38,7 @@ class CreateRouteCache extends Migration
             $table->dateTime('created_at');
             $table->dateTime('updated_at');
             $table->index(['env', 'domain', 'uri', 'method']);
+            $table->index(['env', 'domain', 'route_uri', 'method']);
             $table->index(['env', 'method']);
             $table->index(['env', 'state']);
             $table->index(['env', 'controller_name']);

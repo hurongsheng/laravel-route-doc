@@ -68,7 +68,27 @@ Class RouteDoc
         foreach ($routes as $route) {
             $this->analyseRoute($route, $method_need, $docs);
         }
-        $this->create($docs);
+        return $this->create($docs);
+    }
+
+    protected function create($docs)
+    {
+        $ids = [];
+        foreach ($docs as $doc) {
+            $model = RouteDocModel::getUnique($doc['domain'], $doc['uri'], $doc['method'], App::environment());
+            foreach ($doc as $key => $value) {
+                $model->$key = $value;
+            }
+            $model->state = RouteDocModel::STATE_WORK;
+            $model->save();
+            $ids[] = $model->id;
+        }
+        if ($ids) {
+            $clear = RouteDocModel::clearExcept($ids, App::environment());
+        } else {
+            $clear = 0;
+        }
+        return ['count' => count($docs), 'clear' => $clear];
     }
 
     public static function handleModel(RouteDocModel $model)
@@ -107,29 +127,12 @@ Class RouteDoc
         return preg_match_all('/(?<=[{])[\S]+?(?=[}])/u', $model->uri, $uri_params);
     }
 
-    protected function create($docs)
-    {
-        $ids = [];
-        foreach ($docs as $doc) {
-            $model = RouteDocModel::getUnique($doc['domain'], $doc['uri'], $doc['method']);
-            foreach ($doc as $key => $value) {
-                $model->$key = $value;
-            }
-            $model->state = RouteDocModel::STATE_WORK;
-            $model->env = App::environment();
-            $model->save();
-            $ids[] = $model->id;
-        }
-        if ($ids) {
-            RouteDocModel::clearExcept($ids, App::environment());
-        }
-    }
 
     protected function analyseRoute($route, $method_need, &$docs = [])
     {
         $methods = $route->getMethods();
         $action = $route->getAction();
-        $wheres = RouteTransClass::getInstance($route)->getWheres() ? : [];
+        $wheres = RouteTransClass::getInstance($route)->getWheres();
         $uri = $this->handleUri($route->getUri());
         $action['uri'] = $uri;
         foreach ($methods as $method) {
@@ -137,8 +140,8 @@ Class RouteDoc
                 continue;
             }
             $doc['domain'] = $action['domain'] ? : '';
-            $doc['uri'] = $uri;
-            $doc['method'] = $method;
+            $doc['uri'] = $uri ? : '';
+            $doc['method'] = $method ? : '';
             $doc['as'] = $action['as'] ? : '';
             if ($action['uses'] instanceof Closure) {
                 $doc['uses'] = 'Closure';
@@ -158,7 +161,7 @@ Class RouteDoc
             }
             $doc['namespace'] = $action['namespace'] ? : "";
             $doc['prefix'] = $action['prefix'] ? : '';
-            $doc['where'] = $wheres;
+            $doc['where'] = $wheres ? : [];
             $docs[] = $doc;
         }
     }

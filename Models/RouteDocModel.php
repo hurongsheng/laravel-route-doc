@@ -11,7 +11,7 @@ class RouteDocModel extends Eloquent
     protected $table = 'route_doc';
     protected $casts = ['where' => 'array', 'test_data' => 'array', 'params' => 'array'];
     protected $fillable = [
-        'domain', 'uri', 'method'
+        'domain', 'route_uri', 'method', 'env'
     ];
 
     public function __construct(array $attributes = [])
@@ -21,12 +21,13 @@ class RouteDocModel extends Eloquent
         $this->connection = config('route_doc.table_connection', config('database.default'));
     }
 
-    public static function getUnique($domain, $uri, $method)
+    public static function getUnique($domain, $uri, $method, $env)
     {
         return static::firstOrNew([
             'domain' => $domain,
-            'uri' => $uri,
-            'method' => $method
+            'route_uri' => $uri,
+            'method' => $method,
+            'env' => $env
         ]);
     }
 

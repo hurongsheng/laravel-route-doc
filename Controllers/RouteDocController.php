@@ -128,6 +128,9 @@ class  RouteDocController extends Controller
     /**
      * @description test route
      * @param Request $request
+     * @request  $id route_doc_id
+     * @request  $body request body
+     * @request  $headers request headers=[]
      * @author hurs
      */
     public function postTestRoute(Request $request)
@@ -204,9 +207,9 @@ class  RouteDocController extends Controller
      * @description update from route.php
      * @author hurs
      */
-    public function postRefresh()
+    public function anyRefresh()
     {
         $doc = new RouteDoc();
-        $doc->refresh();
+        return $doc->refresh();
     }
 }
