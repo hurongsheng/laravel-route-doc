@@ -34,7 +34,7 @@ return [
     'btn_list' => [
         'list' => ['domain', 'method', 'controller_name', 'function', 'author'],
         'manage' => [
-            'controller_name', 'function',
+            'domain', 'controller_name', 'function',
             ['method' => 'post', 'uri' => 'refresh', 'name' => 'update from route'],
             ['method' => 'get', 'uri' => 'params-all', 'name' => 'update from doc'],
         ],
