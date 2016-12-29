@@ -161,7 +161,8 @@ class  RouteDocController extends Controller
             $client = new Client();
             $response = $client->$method($url, [
                 'headers' => $headers,
-                'json' => $body
+                'json' => $body,
+                'verify' => false
             ]);
             $code = $response->getStatusCode();
             $model->last_test = in_array($code, $success_code) ? 1 : 0;
