@@ -43,12 +43,24 @@ return [
     'view_show' => [
         'list' => [
             'domain' => 'domain',
+            'description' => 'description',
             'uri' => 'uri',
             'method' => 'method',
             'params' => 'params',
-            'description' => 'description',
+            'return' => 'return',
             'author' => 'author',
             'controller_name' => 'controller_name',
+            'updated_at' => 'update time ↓',
+        ],
+        'detail' => [
+            'description' => 'description',
+            'domain' => 'domain',
+            'uri' => 'uri',
+            'method' => 'method',
+            'params' => 'params',
+            'test_result' => 'result',
+            'return' => 'return',
+            'author' => 'author',
             'updated_at' => 'update time ↓',
         ],
         'manage' => [

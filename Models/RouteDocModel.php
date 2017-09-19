@@ -9,7 +9,7 @@ class RouteDocModel extends Eloquent
     const STATE_DELETE = 0;
     const STATE_WORK = 1;
     protected $table = 'route_doc';
-    protected $casts = ['where' => 'array', 'test_data' => 'array', 'params' => 'array'];
+    protected $casts = ['where' => 'array', 'test_data' => 'array', 'params' => 'array', 'param_types' => 'array'];
     protected $fillable = [
         'domain', 'route_uri', 'method', 'env'
     ];

@@ -30,6 +30,21 @@ class  RouteDocController extends Controller
             return RouteDoc::whereRequestUpdated($where)->toArray();
         });
     }
+    /**
+     * @description list view
+     * @param Int $id
+     * @param Request $request
+     * @return mixed
+     * @author hurs
+     */
+    public function getDetail(Request $request, $id)
+    {
+        return view("RouteDoc::detail", [
+            'btn_list' => [],
+            'doc' => RouteDoc::find($id),
+            'show' => config("route_doc.view_show.detail"),
+        ]);
+    }
 
     /**
      * @description manage view
@@ -166,6 +181,7 @@ class  RouteDocController extends Controller
             ]);
             $code = $response->getStatusCode();
             $model->last_test = in_array($code, $success_code) ? 1 : 0;
+            $model->test_result = $response->getBody()->getContents();
             $model->save();
         } catch (\Exception $e) {
             $code = $e->getCode();

@@ -4,12 +4,14 @@
     <style>
         .route_doc .table_header td {
             font-size: 14px;
+            max-width: 30% !important;
         }
 
         .route_doc .table_body td {
             font-size: 12px;
             vertical-align: middle;
             word-wrap: break-word;
+            max-width: 400px !important;
         }
 
         .route_doc table .btn {

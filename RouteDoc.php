@@ -50,6 +50,11 @@ Class RouteDoc
             ->where($where)->orderBy('updated_at', 'desc')->get();
     }
 
+    public static function find($id)
+    {
+        return RouteDocModel::where('state', RouteDocModel::STATE_WORK)->where('env', App::environment())->find($id);
+    }
+
     public static function btnList($key, $where)
     {
         if (key_exists($key, $where)) {
@@ -102,6 +107,8 @@ Class RouteDoc
                 $model->uri = $fixed_uri;
                 $model->description = $doc['description'] ? : '';
                 $model->author = $doc['author'] ? : '';
+                $model->param_types = $doc['types'] ? : [];
+                $model->return = $doc['return'] ? : [];
             } catch (\Exception $e) {
                 $model->state = RouteDocModel::STATE_DELETE;
             }

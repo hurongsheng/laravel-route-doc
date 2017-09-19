@@ -72,11 +72,15 @@ class analyse_code
     public function getDocument(\ReflectionMethod $method, $url)
     {
         $doc = $method->getDocComment();
+        $params = $this->getParams($doc, $url);
         $doc = [
-            'author' => $this->getAuthor($doc) ? : '',
-            'description' => $this->getDescription($doc) ? : '',
-            'params' => $this->getParams($doc, $url) ? : [],
+            'author'      => $this->getAuthor($doc) ?: '',
+            'description' => $this->getDescription($doc) ?: '',
+            'return' => $this->getReturn($doc) ?: '',
+            'params'      => [],
+            'types'       => [],
         ];
+        $doc = array_merge($doc, $params);
         return $doc;
     }
 
@@ -84,19 +88,22 @@ class analyse_code
     {
 //        $preg_url = "/(?<=[\{])[a-z\_]+(?=[\}])/u";
 //        preg_match_all($preg_url, $url, $hidden_urls);
-        $preg = "/(?<=@param |@request )[ \t\S]*/u";
-        $preg2 = "/(?<=[$])[ \t\S]*/u";
-        $preg3 = "/[\S]+/u";
-        preg_match_all($preg, $doc, $matches);
-        $params = [];
+        $preg_line = "/(?<=@param |@request )[ \t\S]*/u";
+        $preg_param = "/(?<=[$])[ \t\S]*/u";
+        $preg_param_type = "/[ \t\S]*(?=[ ][$])/u";
+        $preg_param_desc = "/[\S]+/u";
+        preg_match_all($preg_line, $doc, $matches);
+        $params = ['params' => '', 'types' => ''];
         foreach ($matches[0] as $key => &$match) {
-            preg_match($preg2, $match, $m);
-            preg_match_all($preg3, $m[0], $m);
+            preg_match($preg_param, $match, $m);
+            preg_match($preg_param_type, $match, $type);
+            $type = trim($type[0]);
+            preg_match_all($preg_param_desc, $m[0], $m);
             $k = $m[0][0];
             if (!in_array($k, $this->hidden_param)) {
-//            if (in_array($match['param'], array_merge($this->hidden_param, $hidden_urls[0] ? : []))) {
                 unset($m[0][0]);
-                $params[$k] = implode(" ", $m[0]) ? : '';
+                $params['params'][$k] = implode(" ", $m[0]) ? : '';
+                $params['types'][$k] = $type;
             }
         }
         return $params;
@@ -110,6 +117,10 @@ class analyse_code
     public function getAuthor($doc)
     {
         return $this->getBaseData($doc, 'author');
+    }
+    public function getReturn($doc)
+    {
+        return $this->getBaseData($doc, 'return');
     }
 
     protected function getBaseData($doc, $key)

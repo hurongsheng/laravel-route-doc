@@ -24,6 +24,7 @@
                             <table>
                                 @foreach($doc[$key] as $k=>$desc)
                                     <tr>
+                                        <td>{{ucfirst($doc['param_types'][$k])}}</td>
                                         <td>{{$k}}</td>
                                         <td>{{$desc}}</td>
                                     </tr>
@@ -32,6 +33,11 @@
                         </td>
                     @elseif($doc[$key]==[])
                         <td class="{{$key}}"></td>
+                    @elseif($key=='return')
+                        <td class="{{$key}}">{!! str_replace("|","<br/>",$doc[$key]) !!}</td>
+                    @elseif($key=='uri')
+                        <td class="{{$key}}"><a href="detail/{{$doc['id']}}" target="_blank">{{is_array($doc[$key])?json_encode($doc[$key]):$doc[$key]}}</a>
+                        </td>
                     @else
                         <td class="{{$key}}">{{is_array($doc[$key])?json_encode($doc[$key]):$doc[$key]}}</td>
                     @endif
